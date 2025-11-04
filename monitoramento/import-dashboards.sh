@@ -79,15 +79,38 @@ for dashboard_file in "$DASHBOARD_DIR"/*.json; do
         dashboard_name=$(basename "$dashboard_file" .json)
         echo "📊 Importando dashboard: $dashboard_name"
         
-        # Importar dashboard
+        # Criar versão limpa do dashboard (sem id/uid que podem causar conflitos)
+        clean_dashboard="/tmp/dashboard_clean_$$.json"
+        echo "📊 Importando dashboard: $dashboard_name"
+        
+        # Descobrir UID do datasource Zabbix
+        ZABBIX_UID=$(curl -s -u admin:admin "http://localhost:3000/api/datasources" | grep -o '"uid":"[^"]*"[^}]*"type":"alexanderzobnin-zabbix-datasource"' | grep -o '"uid":"[^"]*"' | cut -d'"' -f4)
+        
+        if [ -z "$ZABBIX_UID" ]; then
+            echo "⚠️  Não foi possível descobrir UID do datasource Zabbix, usando dashboard original"
+            dashboard_content=$(cat "$dashboard_file")
+        else
+            echo "   UID Zabbix detectado: $ZABBIX_UID"
+            # Substituir UID hardcoded pelo UID real e remover id/uid do dashboard
+            dashboard_content=$(cat "$dashboard_file" | sed "s/PA67C5EADE9207728/$ZABBIX_UID/g" | sed 's/"id":[0-9]*,//g; s/"uid":"[^"]*",//g')
+        fi
+        
+        # Criar payload temporário para evitar "Argument list too long"
+        temp_payload="/tmp/dashboard_payload_$$.json"
+        echo "{" > "$temp_payload"
+        echo "\"dashboard\": $dashboard_content," >> "$temp_payload"
+        echo "\"overwrite\": true" >> "$temp_payload"
+        echo "}" >> "$temp_payload"
+        
+        # Importar dashboard usando arquivo temporário
         curl -s -X POST \
             -H "Content-Type: application/json" \
             -u admin:admin \
             http://localhost:3000/api/dashboards/db \
-            -d "{
-                \"dashboard\": $(cat "$dashboard_file"),
-                \"overwrite\": true
-            }" >/dev/null
+            -d @"$temp_payload" >/dev/null
+        
+        # Limpar arquivo temporário
+        rm -f "$temp_payload"
         
         echo "✅ Dashboard $dashboard_name importado!"
     fi

@@ -5,7 +5,7 @@
 
 set -e
 
-echo "🔐 Monitoring Security Evolution - Level 1 Setup"
+echo "🔐 Monitoring Security Evolution - Level 2 Setup"
 echo "================================================"
 
 # Cores para output
@@ -106,7 +106,10 @@ wait_for_services() {
     
     # Aguardar Zabbix (precisa mais tempo para criar tabelas)
     log_info "Aguardando Zabbix criar tabelas no banco (pode demorar até 10 minutos)..."
-    sleep 60
+    log_info "Aguardando Zabbix database estar pronto (6 minutos)..."
+    sleep 360  # 6 minutos para garantir que todas as tabelas sejam criadas
+    
+    log_success "Zabbix inicialização concluída após 6 minutos"
     
     # Aguardar Grafana
     log_info "Aguardando Grafana..."
