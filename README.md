@@ -2,13 +2,19 @@
 
 **Environment Management + Automated Security** - Stack completa de monitoramento com gerenciamento avançado de variáveis de ambiente.
 
-## 🚀 **Quick Start (1 comando)**
+## 🚀 **Quick Start (3 comandos)**
 
 ```bash
-# Clone e execute
+# 1. Clone
 git clone https://github.com/jlui70/monitoring-security-level2.git
 cd monitoring-security-level2
-./quick-setup.sh
+
+# 2. Gerar e aplicar senhas
+echo "1" | ./generate-secure-passwords.sh
+./apply-passwords.sh
+
+# 3. Deploy
+cd monitoramento && ./setup.sh
 ```
 
 **Pronto!** Aguarde 6 minutos e acesse:
@@ -17,18 +23,19 @@ cd monitoring-security-level2
 
 ---
 
-## 🔧 **Setup Manual** (opcional)
-
-Se preferir fazer passo a passo:
+## 🔧 **Setup Manual** (mesmo processo, passo a passo)
 
 ```bash
-# 1. Gerar senhas
+# 1. Gerar senhas para desenvolvimento
 echo "1" | ./generate-secure-passwords.sh
 
-# 2. Validar
-./validate-environment.sh environments/.env.dev
+# 2. Aplicar senhas ao .env
+./apply-passwords.sh
 
-# 3. Deploy  
+# 3. Validar (opcional)
+./validate-environment.sh .env
+
+# 4. Deploy
 cd monitoramento && ./setup.sh
 ```
 
