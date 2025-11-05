@@ -98,66 +98,93 @@ setup_stack() {
 
 # Função aprimorada para aguardar o Zabbix estar pronto
 wait_for_zabbix_smart() {
-    log_info "Aguardando Zabbix criar tabelas no banco (pode demorar até 10 minutos)..."
+    log_info "Aguardando Zabbix iniciar criação do banco de dados..."
     
-    local max_attempts=60  # 10 minutos (60 * 10 segundos)
+    local max_wait=30  # Máximo 5 minutos para detectar início de criação
     local attempt=0
-    local zabbix_ready=false
+    local creation_started=false
     
-    while [ $attempt -lt $max_attempts ]; do
+    # Fase 1: Aguardar início da criação das tabelas
+    while [ $attempt -lt $max_wait ]; do
         attempt=$((attempt + 1))
         
-        # Verificar se o Zabbix Web está respondendo
-        if curl -s --max-time 5 http://localhost:8080 >/dev/null 2>&1; then
-            log_info "Zabbix Web interface está respondendo..."
-            
-            # Verificar se conseguimos fazer login na API
-            local api_test=$(curl -s --max-time 10 -X POST -H "Content-Type: application/json" -d "{"jsonrpc":"2.0","method":"user.login","params":{"user":"Admin","password":"zabbix"},"id":1}" http://localhost:8080/api_jsonrpc.php 2>/dev/null || echo "")
-            
-            if echo "$api_test" | grep -q ""result""; then
-                log_success "Zabbix API está funcionando - banco de dados inicializado com sucesso!"
-                zabbix_ready=true
-                break
-            else
-                log_info "Aguardando inicialização do banco de dados... (tentativa $attempt/$max_attempts)"
-            fi
-        else
-            log_info "Aguardando Zabbix Web interface... (tentativa $attempt/$max_attempts)"
+        local server_logs=$(docker logs zabbix-server 2>/dev/null || echo "")
+        
+        # Verificar se iniciou criação do schema/usuário
+        if echo "$server_logs" | grep -qE "Creating 'zabbix' user|Creating 'zabbix' schema|Database 'zabbix' already exists"; then
+            log_success "Zabbix iniciou criação do banco de dados!"
+            creation_started=true
+            break
         fi
         
-        # Verificar logs do Zabbix Server para identificar problemas REAIS
-        # Ignorar primeiros 3 minutos (18 tentativas x 10seg) - é normal aguardar MySQL iniciar
-        if [ $attempt -gt 18 ]; then
-            local server_logs=$(docker logs zabbix-server --tail 10 2>/dev/null || echo "")
-            
-            # Verificar se AINDA está com problema MySQL após período de grace
-            if echo "$server_logs" | grep -q "MySQL server is not available"; then
-                # Verificar se já iniciou criação de tabelas (sinal de que está progredindo)
-                if ! echo "$server_logs" | grep -qE "Creating.*schema|Database.*already exists"; then
-                    log_warning "Detectado problema de conexão MySQL no Zabbix Server"
-                    
-                    # Após 5 minutos (30 tentativas), erro crítico
-                    if [ $attempt -eq 30 ]; then
-                        log_error "Zabbix não consegue conectar ao MySQL após 5 minutos"
-                        log_error "Possível causa: volumes persistentes com senhas antigas"
-                        log_error "Solução: Execute docker-compose down -v e tente novamente"
-                        return 1
-                    fi
-                fi
+        # Verificar se ainda está aguardando MySQL (normal nos primeiros 1-2 minutos)
+        if echo "$server_logs" | grep -q "MySQL server is not available"; then
+            if [ $attempt -le 6 ]; then
+                log_info "Aguardando MySQL ficar disponível... ($attempt/30)"
+            elif [ $attempt -le 18 ]; then
+                log_info "MySQL ainda inicializando... ($attempt/30)"
+            else
+                log_warning "MySQL demorando mais que o esperado... ($attempt/30)"
             fi
+        else
+            log_info "Verificando status do Zabbix... ($attempt/30)"
+        fi
+        
+        # Após 5 minutos sem progresso = problema real
+        if [ $attempt -eq 30 ]; then
+            log_error "Zabbix não iniciou criação do banco após 5 minutos"
+            log_error "Possível causa: volumes persistentes com senhas antigas"
+            log_error "Solução: Execute 'docker-compose down -v' e tente novamente"
+            log_error ""
+            log_error "Últimas linhas do log do Zabbix:"
+            docker logs zabbix-server --tail 15
+            return 1
         fi
         
         sleep 10
     done
     
-    if [ "$zabbix_ready" = false ]; then
-        log_error "Timeout: Zabbix não ficou pronto em 10 minutos"
-        log_error "Verificando logs do Zabbix Server..."
-        docker logs zabbix-server --tail 20
+    # Se não detectou início da criação, erro
+    if [ "$creation_started" = false ]; then
+        log_error "Falha ao detectar início da criação do banco Zabbix"
         return 1
     fi
     
-    log_success "Zabbix inicialização verificada e concluída com sucesso!"
+    # Fase 2: Aguardar 6 minutos para criação completa das tabelas
+    log_info "Aguardando criação completa das tabelas (6 minutos)..."
+    log_info "Isso é normal - Zabbix cria mais de 150 tabelas no primeiro boot"
+    sleep 360
+    
+    # Fase 3: Verificar se API está funcional
+    log_info "Verificando se Zabbix API está funcional..."
+    local api_attempts=0
+    local api_ready=false
+    
+    while [ $api_attempts -lt 12 ]; do  # 2 minutos adicionais
+        api_attempts=$((api_attempts + 1))
+        
+        if curl -s --max-time 5 http://localhost:8080 >/dev/null 2>&1; then
+            local api_test=$(curl -s --max-time 10 -X POST \
+                -H "Content-Type: application/json" \
+                -d '{"jsonrpc":"2.0","method":"user.login","params":{"user":"Admin","password":"zabbix"},"id":1}' \
+                http://localhost:8080/api_jsonrpc.php 2>/dev/null || echo "")
+            
+            if echo "$api_test" | grep -q '"result"'; then
+                log_success "Zabbix API está funcionando - inicialização concluída!"
+                api_ready=true
+                break
+            fi
+        fi
+        
+        log_info "Aguardando Zabbix API... (tentativa $api_attempts/12)"
+        sleep 10
+    done
+    
+    if [ "$api_ready" = false ]; then
+        log_warning "Zabbix API não respondeu, mas processo de criação foi detectado"
+        log_warning "Continuando... Zabbix pode precisar de mais alguns minutos"
+    fi
+    
     return 0
 }
 
