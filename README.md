@@ -41,6 +41,30 @@ cd monitoramento && ./setup.sh
 
 ---
 
+---
+
+## 🧹 **Limpeza (se não for primeira instalação)**
+
+**⚠️ IMPORTANTE**: Se você já executou esta stack antes, limpe dados antigos para evitar conflitos:
+
+```bash
+# Pare e remova dados antigos
+cd monitoramento && docker-compose down -v
+
+# Limpeza completa (opcional - remove projeto e limpa Docker)
+cd ~/Projects && rm -rf monitoring-security-level2
+docker system prune -f
+
+# Reinstalação limpa
+git clone https://github.com/jlui70/monitoring-security-level2.git
+cd monitoring-security-level2
+echo "1" | ./generate-secure-passwords.sh
+./apply-passwords.sh
+cd monitoramento && ./setup.sh
+```
+
+**💡 Por que limpar?** Volumes Docker persistem dados do MySQL com senhas antigas, causando conflitos de autenticação.
+
 ## 📊 **O que você ganha no Level 2?**
 
 ### **✅ Recursos Adicionais do Level 2:**

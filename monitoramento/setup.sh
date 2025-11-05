@@ -96,6 +96,61 @@ setup_stack() {
     fi
 }
 
+# Função aprimorada para aguardar o Zabbix estar pronto
+wait_for_zabbix_smart() {
+    log_info "Aguardando Zabbix criar tabelas no banco (pode demorar até 10 minutos)..."
+    
+    local max_attempts=60  # 10 minutos (60 * 10 segundos)
+    local attempt=0
+    local zabbix_ready=false
+    
+    while [ $attempt -lt $max_attempts ]; do
+        attempt=$((attempt + 1))
+        
+        # Verificar se o Zabbix Web está respondendo
+        if curl -s --max-time 5 http://localhost:8080 >/dev/null 2>&1; then
+            log_info "Zabbix Web interface está respondendo..."
+            
+            # Verificar se conseguimos fazer login na API
+            local api_test=$(curl -s --max-time 10 -X POST -H "Content-Type: application/json" -d "{"jsonrpc":"2.0","method":"user.login","params":{"user":"Admin","password":"zabbix"},"id":1}" http://localhost:8080/api_jsonrpc.php 2>/dev/null || echo "")
+            
+            if echo "$api_test" | grep -q ""result""; then
+                log_success "Zabbix API está funcionando - banco de dados inicializado com sucesso!"
+                zabbix_ready=true
+                break
+            else
+                log_info "Aguardando inicialização do banco de dados... (tentativa $attempt/$max_attempts)"
+            fi
+        else
+            log_info "Aguardando Zabbix Web interface... (tentativa $attempt/$max_attempts)"
+        fi
+        
+        # Verificar logs do Zabbix Server para identificar problemas
+        local server_logs=$(docker logs zabbix-server --tail 5 2>/dev/null || echo "")
+        if echo "$server_logs" | grep -q "MySQL server is not available"; then
+            log_warning "Detectado problema de conexão MySQL no Zabbix Server"
+            if [ $attempt -eq 30 ]; then  # Após 5 minutos, mostrar dica
+                log_error "Zabbix não consegue conectar ao MySQL após 5 minutos"
+                log_error "Possível causa: volumes persistentes com senhas antigas"
+                log_error "Solução: Execute docker-compose down -v e tente novamente"
+                return 1
+            fi
+        fi
+        
+        sleep 10
+    done
+    
+    if [ "$zabbix_ready" = false ]; then
+        log_error "Timeout: Zabbix não ficou pronto em 10 minutos"
+        log_error "Verificando logs do Zabbix Server..."
+        docker logs zabbix-server --tail 20
+        return 1
+    fi
+    
+    log_success "Zabbix inicialização verificada e concluída com sucesso!"
+    return 0
+}
+
 # Aguardar serviços ficarem prontos
 wait_for_services() {
     log_info "Aguardando serviços ficarem prontos..."
@@ -104,12 +159,11 @@ wait_for_services() {
     log_info "Aguardando MySQL..."
     sleep 30
     
-    # Aguardar Zabbix (precisa mais tempo para criar tabelas)
-    log_info "Aguardando Zabbix criar tabelas no banco (pode demorar até 10 minutos)..."
-    log_info "Aguardando Zabbix database estar pronto (6 minutos)..."
-    sleep 360  # 6 minutos para garantir que todas as tabelas sejam criadas
-    
-    log_success "Zabbix inicialização concluída após 6 minutos"
+    # Aguardar Zabbix com verificação inteligente
+    if ! wait_for_zabbix_smart; then
+        log_error "Falha na inicialização do Zabbix - Abortando setup"
+        exit 1
+    fi
     
     # Aguardar Grafana
     log_info "Aguardando Grafana..."
