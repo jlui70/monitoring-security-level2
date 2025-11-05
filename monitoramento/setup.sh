@@ -125,15 +125,25 @@ wait_for_zabbix_smart() {
             log_info "Aguardando Zabbix Web interface... (tentativa $attempt/$max_attempts)"
         fi
         
-        # Verificar logs do Zabbix Server para identificar problemas
-        local server_logs=$(docker logs zabbix-server --tail 5 2>/dev/null || echo "")
-        if echo "$server_logs" | grep -q "MySQL server is not available"; then
-            log_warning "Detectado problema de conexão MySQL no Zabbix Server"
-            if [ $attempt -eq 30 ]; then  # Após 5 minutos, mostrar dica
-                log_error "Zabbix não consegue conectar ao MySQL após 5 minutos"
-                log_error "Possível causa: volumes persistentes com senhas antigas"
-                log_error "Solução: Execute docker-compose down -v e tente novamente"
-                return 1
+        # Verificar logs do Zabbix Server para identificar problemas REAIS
+        # Ignorar primeiros 3 minutos (18 tentativas x 10seg) - é normal aguardar MySQL iniciar
+        if [ $attempt -gt 18 ]; then
+            local server_logs=$(docker logs zabbix-server --tail 10 2>/dev/null || echo "")
+            
+            # Verificar se AINDA está com problema MySQL após período de grace
+            if echo "$server_logs" | grep -q "MySQL server is not available"; then
+                # Verificar se já iniciou criação de tabelas (sinal de que está progredindo)
+                if ! echo "$server_logs" | grep -qE "Creating.*schema|Database.*already exists"; then
+                    log_warning "Detectado problema de conexão MySQL no Zabbix Server"
+                    
+                    # Após 5 minutos (30 tentativas), erro crítico
+                    if [ $attempt -eq 30 ]; then
+                        log_error "Zabbix não consegue conectar ao MySQL após 5 minutos"
+                        log_error "Possível causa: volumes persistentes com senhas antigas"
+                        log_error "Solução: Execute docker-compose down -v e tente novamente"
+                        return 1
+                    fi
+                fi
             fi
         fi
         
