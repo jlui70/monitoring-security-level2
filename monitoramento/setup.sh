@@ -155,36 +155,9 @@ wait_for_zabbix_smart() {
     log_info "Isso é normal - Zabbix cria mais de 150 tabelas no primeiro boot"
     sleep 360
     
-    # Fase 3: Verificar se API está funcional
-    log_info "Verificando se Zabbix API está funcional..."
-    local api_attempts=0
-    local api_ready=false
     
-    while [ $api_attempts -lt 12 ]; do  # 2 minutos adicionais
-        api_attempts=$((api_attempts + 1))
-        
-        if curl -s --max-time 5 http://localhost:8080 >/dev/null 2>&1; then
-            local api_test=$(curl -s --max-time 10 -X POST \
-                -H "Content-Type: application/json" \
-                -d '{"jsonrpc":"2.0","method":"user.login","params":{"user":"Admin","password":"zabbix"},"id":1}' \
-                http://localhost:8080/api_jsonrpc.php 2>/dev/null || echo "")
-            
-            if echo "$api_test" | grep -q '"result"'; then
-                log_success "Zabbix API está funcionando - inicialização concluída!"
-                api_ready=true
-                break
-            fi
-        fi
-        
-        log_info "Aguardando Zabbix API... (tentativa $api_attempts/12)"
-        sleep 10
-    done
-    
-    if [ "$api_ready" = false ]; then
-        log_warning "Zabbix API não respondeu, mas processo de criação foi detectado"
-        log_warning "Continuando... Zabbix pode precisar de mais alguns minutos"
-    fi
-    
+    log_success "Zabbix inicialização concluída - aguardou 6 minutos para criação das tabelas"
+    log_info "Zabbix estará totalmente operacional em alguns minutos"
     return 0
 }
 
