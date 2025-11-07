@@ -1,28 +1,21 @@
-🔐 Monitoring Security Evolution - Nível 2: Variáveis de Ambiente
+# 🔐 Monitoring Security Stack - Level 2
 
-**Variáveis de Ambiente + Segurança Automatizada** - Stack completa de monitoramento com gerenciamento avançado de variáveis de ambiente.
+**Environment Management + Automated Security** - Stack completa de monitoramento com gerenciamento avançado de variáveis de ambiente.
 
-Caso tenha realizado o projeto de Segurança nível (1) execute a limpeza antes de iniciar o nível (2) para evitar conflitos na configuração.
+---
 
-🧹 Limpeza completa do projeto segurança nível 1
+## 🚀 **Quick Start - Primeira Instalação**
 
-Parar e remover todos os containers
-cd ~/docker-compose down -v
-
-Limpeza completa (remove diretporio projeto monitoring-security-level1 e limpa Docker)
-cd ~/rm -rf monitoring-security-level1 && docker system prune -f
-
-## 🚀 **Quick Start - Configuração Segurança nível (2)**
+**⚠️ IMPORTANTE**: Na primeira vez, você PRECISA gerar senhas antes do deploy!
 
 ```bash
-# 1. Clone
+# 1. Clone do repositório
 cd ~
 git clone https://github.com/jlui70/monitoring-security-level2.git
 cd monitoring-security-level2
 
-# 2. Gerar e aplicar senhas
+# 2. Gerar senhas (OBRIGATÓRIO na primeira vez!)
 echo "1" | ./generate-secure-passwords.sh
-./apply-passwords.sh
 
 # 3. Deploy
 cd monitoramento && ./setup.sh
@@ -30,7 +23,27 @@ cd monitoramento && ./setup.sh
 
 **Pronto!** Aguarde 6 minutos e acesse:
 - **Zabbix**: http://localhost:8080 (Admin/zabbix)
-- **Grafana**: http://localhost:3000 (admin/sua-senha-gerada)
+- **Grafana**: http://localhost:3000 (admin/senha-gerada)
+
+💡 **A senha do Grafana será exibida no final do setup!**
+
+---
+
+## 🧹 **Limpeza Completa (se já usou antes)**
+
+Se você já executou este projeto antes ou o Level 1, limpe tudo antes:
+
+```bash
+cd ~/monitoring-security-level2/monitoramento
+docker-compose down -v
+cd ~/
+rm -rf monitoring-security-level2
+docker system prune -f
+
+# Agora faça instalação limpa (seguir Quick Start acima)
+```
+
+**💡 Por que limpar?** Volumes Docker antigos guardam senhas antigas e causam conflitos.
 
 ---
 
@@ -172,6 +185,62 @@ docker-compose down
 
 # Gerar senhas para produção
 echo "3" | ./generate-secure-passwords.sh
+```
+
+---
+
+## ⚠️ **Troubleshooting - Erros Comuns**
+
+### **Erro: "Senhas não geradas para ambiente"**
+```
+[ERROR] Senhas não geradas para ambiente dev
+Execute primeiro:
+  echo "1" | ../generate-secure-passwords.sh
+```
+
+**Solução:** Você esqueceu de gerar senhas! Execute:
+```bash
+cd ~/monitoring-security-level2
+echo "1" | ./generate-secure-passwords.sh    # Development
+cd monitoramento && ./setup.sh
+```
+
+### **Erro: "Grafana não aceita a senha gerada"**
+```
+Login failed: invalid password
+```
+
+**Solução:** Volumes antigos com senhas antigas. Limpe tudo:
+```bash
+cd monitoramento
+docker-compose down -v
+./setup.sh
+```
+
+### **Erro: "Port 3000 already in use"**
+```
+Error: bind: address already in use
+```
+
+**Solução:** Algum serviço está usando a porta. Pare containers antigos:
+```bash
+docker ps -a
+docker stop $(docker ps -aq)
+docker-compose up -d
+```
+
+### **Como saber qual senha usar no Grafana?**
+A senha é exibida no final do `setup.sh`:
+```
+📊 Grafana:
+   URL: http://localhost:3000
+   User: admin
+   Password: Dev_Admin_XYZ_2024!@    ← Use esta senha
+```
+
+Ou consulte o arquivo:
+```bash
+cat environments/.env.dev.passwords | grep GF_SECURITY_ADMIN_PASSWORD
 ```
 
 ---
