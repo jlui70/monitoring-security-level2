@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# 🚀 Setup script para Monitoring Security Level 1
+# 🚀 Setup script para Monitoring Security Level 2
 # Script de inicialização e validação da stack
+# Uso: ./setup.sh [comando] [--env=dev|staging|prod]
 
 set -e
 
@@ -30,6 +31,222 @@ log_warning() {
 
 log_error() {
     echo -e "${RED}[ERROR]${NC} $1"
+}
+
+# Função para selecionar ambiente
+select_environment() {
+    # Verificar se ambiente foi passado por parâmetro
+    for arg in "$@"; do
+        case $arg in
+            --env=dev|--env=development)
+                SELECTED_ENV="dev"
+                return
+                ;;
+            --env=staging|--env=stg)
+                SELECTED_ENV="staging"
+                return
+                ;;
+            --env=prod|--env=production)
+                SELECTED_ENV="prod"
+                return
+                ;;
+        esac
+    done
+    
+    # Se não foi passado por parâmetro, verificar se .env existe
+    if [ -f .env ]; then
+        CURRENT_ENV=$(grep "^ENVIRONMENT=" .env | cut -d'=' -f2 2>/dev/null || echo "")
+        
+        if [ -n "$CURRENT_ENV" ]; then
+            case $CURRENT_ENV in
+                development)
+                    DETECTED_ENV="dev"
+                    ;;
+                staging)
+                    DETECTED_ENV="staging"
+                    ;;
+                production)
+                    DETECTED_ENV="prod"
+                    ;;
+                *)
+                    DETECTED_ENV="dev"
+                    ;;
+            esac
+            
+            echo ""
+            log_info "Ambiente detectado no .env: $CURRENT_ENV"
+            echo ""
+            echo "Deseja usar este ambiente ou escolher outro?"
+            echo "  1) Development"
+            echo "  2) Staging"
+            echo "  3) Production"
+            echo "  [Enter] Usar ambiente detectado ($DETECTED_ENV)"
+            echo ""
+            read -p "Escolha (1-3 ou Enter): " choice
+            
+            case $choice in
+                1)
+                    SELECTED_ENV="dev"
+                    ;;
+                2)
+                    SELECTED_ENV="staging"
+                    ;;
+                3)
+                    SELECTED_ENV="prod"
+                    ;;
+                "")
+                    SELECTED_ENV="$DETECTED_ENV"
+                    log_info "Usando ambiente detectado: $DETECTED_ENV"
+                    ;;
+                *)
+                    log_warning "Opção inválida. Usando ambiente detectado: $DETECTED_ENV"
+                    SELECTED_ENV="$DETECTED_ENV"
+                    ;;
+            esac
+        else
+            # .env existe mas sem ENVIRONMENT definido
+            prompt_environment_selection
+        fi
+    else
+        # .env não existe
+        log_warning "Arquivo .env não encontrado"
+        prompt_environment_selection
+    fi
+}
+
+# Função para prompt de seleção de ambiente
+prompt_environment_selection() {
+    echo ""
+    echo "🌍 Selecione o ambiente para deploy:"
+    echo "  1) Development"
+    echo "  2) Staging"
+    echo "  3) Production"
+    echo ""
+    read -p "Escolha (1-3): " choice
+    
+    case $choice in
+        1)
+            SELECTED_ENV="dev"
+            ;;
+        2)
+            SELECTED_ENV="staging"
+            ;;
+        3)
+            SELECTED_ENV="prod"
+            ;;
+        *)
+            log_error "Opção inválida"
+            exit 1
+            ;;
+    esac
+}
+
+# Função para preparar ambiente selecionado
+prepare_environment() {
+    local env=$1
+    
+    log_info "Preparando ambiente: $env"
+    
+    # Verificar se senhas foram geradas
+    PASSWORD_FILE="../environments/.env.${env}.passwords"
+    if [ ! -f "$PASSWORD_FILE" ]; then
+        log_error "Senhas não geradas para ambiente $env"
+        echo ""
+        echo "Execute primeiro:"
+        case $env in
+            dev)
+                echo "  echo \"1\" | ../generate-secure-passwords.sh"
+                ;;
+            staging)
+                echo "  echo \"2\" | ../generate-secure-passwords.sh"
+                ;;
+            prod)
+                echo "  echo \"3\" | ../generate-secure-passwords.sh"
+                ;;
+        esac
+        echo "  ../apply-passwords.sh $env"
+        exit 1
+    fi
+    
+    # Aplicar senhas automaticamente se necessário
+    if [ ! -f .env ] || ! grep -q "$(grep MYSQL_PASSWORD $PASSWORD_FILE)" .env 2>/dev/null; then
+        log_info "Aplicando senhas do ambiente $env..."
+        cd .. && ./apply-passwords.sh $env && cd monitoramento
+        log_success "Senhas aplicadas!"
+    else
+        log_success "Arquivo .env já configurado para $env"
+    fi
+}
+
+# Carregar variáveis de ambiente DEPOIS de preparar
+load_environment() {
+    if [ -f .env ]; then
+        source .env
+        log_success "Variáveis de ambiente carregadas"
+    else
+        log_error "Arquivo .env não encontrado após preparação"
+        exit 1
+    fi
+}
+
+# Verificar rotação de senhas
+check_password_rotation() {
+    log_info "Verificando necessidade de rotação de senhas..."
+    
+    # Procurar arquivo de senhas no diretório pai
+    PASSWORD_FILE="../environments/.env.dev.passwords"
+    
+    if [ ! -f "$PASSWORD_FILE" ]; then
+        # Tentar outros ambientes
+        for env in staging prod; do
+            if [ -f "../environments/.env.${env}.passwords" ]; then
+                PASSWORD_FILE="../environments/.env.${env}.passwords"
+                break
+            fi
+        done
+    fi
+    
+    if [ ! -f "$PASSWORD_FILE" ]; then
+        log_warning "Arquivo de senhas não encontrado. Ignorando verificação de rotação."
+        return
+    fi
+    
+    # Extrair data de rotação necessária
+    ROTATION_DATE=$(grep "PASSWORD_ROTATION_NEEDED_AT=" "$PASSWORD_FILE" | cut -d'=' -f2)
+    
+    if [ -z "$ROTATION_DATE" ]; then
+        log_warning "Data de rotação não encontrada no arquivo de senhas."
+        return
+    fi
+    
+    # Data atual no formato YYYYMMDD
+    CURRENT_DATE=$(date '+%Y%m%d')
+    
+    # Comparar datas
+    if [ "$CURRENT_DATE" -ge "$ROTATION_DATE" ]; then
+        echo ""
+        log_error "⚠️  ATENÇÃO: ROTAÇÃO DE SENHAS NECESSÁRIA!"
+        log_error "As senhas devem ser rotacionadas (passaram 90 dias desde a geração)"
+        log_error "Data de rotação requerida: $ROTATION_DATE"
+        log_error "Data atual: $CURRENT_DATE"
+        echo ""
+        echo -e "${YELLOW}Execute os seguintes comandos para rotacionar:${NC}"
+        echo "  cd .. && echo \"1\" | ./generate-secure-passwords.sh  # gerar novas senhas"
+        echo "  ./apply-passwords.sh                                  # aplicar senhas"
+        echo "  cd monitoramento && docker-compose down -v            # limpar volumes"
+        echo "  docker-compose up -d                                  # recriar containers"
+        echo ""
+        read -p "Deseja continuar mesmo assim? (s/N): " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Ss]$ ]]; then
+            log_error "Setup cancelado. Por favor, rotacione as senhas primeiro."
+            exit 1
+        fi
+    else
+        # Calcular dias restantes
+        DAYS_LEFT=$(( ($(date -d "$ROTATION_DATE" +%s) - $(date -d "$CURRENT_DATE" +%s)) / 86400 ))
+        log_success "Senhas válidas. Rotação necessária em $DAYS_LEFT dias (data: $ROTATION_DATE)"
+    fi
 }
 
 # Verificar pré-requisitos
@@ -218,6 +435,10 @@ validate_services() {
 
 # Mostrar informações de acesso
 show_access_info() {
+    # Obter credenciais do .env
+    GRAFANA_USER="${GF_SECURITY_ADMIN_USER:-admin}"
+    GRAFANA_PASS="${GF_SECURITY_ADMIN_PASSWORD:-admin}"
+    
     echo ""
     echo "🎉 Setup concluído! Acesse os serviços:"
     echo "========================================"
@@ -229,8 +450,8 @@ show_access_info() {
     echo ""
     echo "📊 Grafana:"
     echo "   URL: http://localhost:3000"
-    echo "   User: admin"
-    echo "   Password: admin"
+    echo "   User: ${GRAFANA_USER}"
+    echo "   Password: ${GRAFANA_PASS}"
     echo ""
     echo "⚡ Prometheus:"
     echo "   URL: http://localhost:9090"
@@ -252,7 +473,15 @@ show_access_info() {
 main() {
     case "${1:-setup}" in
         "setup")
+            select_environment "$@"
+            prepare_environment "$SELECTED_ENV"
+            load_environment
+            
+            log_success "🌍 Deploy configurado para ambiente: $SELECTED_ENV"
+            echo ""
+            
             check_prerequisites
+            check_password_rotation
             check_ports
             setup_stack
             wait_for_services
@@ -306,10 +535,14 @@ main() {
             fi
             ;;
         "help")
-            echo "Uso: $0 [comando]"
+            echo "Uso: $0 [comando] [--env=dev|staging|prod]"
             echo ""
             echo "Comandos disponíveis:"
             echo "  setup     - Setup completo da stack (padrão)"
+            echo "              Exemplos:"
+            echo "                ./setup.sh                    # Detecta ambiente ou pergunta"
+            echo "                ./setup.sh --env=dev          # Força ambiente dev"
+            echo "                ./setup.sh setup --env=prod   # Força ambiente prod"
             echo "  start     - Iniciar stack existente"
             echo "  stop      - Parar stack"
             echo "  restart   - Reiniciar stack"
@@ -317,6 +550,11 @@ main() {
             echo "  logs      - Mostrar logs em tempo real"
             echo "  clean     - Remover stack e volumes (CUIDADO!)"
             echo "  help      - Mostrar esta ajuda"
+            echo ""
+            echo "Ambientes disponíveis:"
+            echo "  dev, development  - Ambiente de desenvolvimento"
+            echo "  staging, stg      - Ambiente de homologação"
+            echo "  prod, production  - Ambiente de produção"
             ;;
         *)
             log_error "Comando inválido: $1"

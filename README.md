@@ -40,7 +40,7 @@ cd monitoramento && ./setup.sh
 # 1. Gerar senhas para desenvolvimento
 echo "1" | ./generate-secure-passwords.sh
 
-# 2. Aplicar senhas ao .env
+# 2. Aplicar senhas ao .env (dev é padrão)
 ./apply-passwords.sh
 
 # 3. Validar (opcional)
@@ -48,6 +48,70 @@ echo "1" | ./generate-secure-passwords.sh
 
 # 4. Deploy
 cd monitoramento && ./setup.sh
+```
+
+---
+
+## 🌍 **Trabalhando com Múltiplos Ambientes**
+
+O projeto suporta 3 ambientes com configurações e senhas específicas:
+
+### **Desenvolvimento (Dev)**
+```bash
+echo "1" | ./generate-secure-passwords.sh   # Gerar senhas
+./apply-passwords.sh dev                    # Aplicar senhas (ou sem parâmetro)
+cd monitoramento && ./setup.sh              # Deploy
+```
+
+### **Staging (Homologação)**
+```bash
+echo "2" | ./generate-secure-passwords.sh   # Gerar senhas
+./apply-passwords.sh staging                # Aplicar senhas
+cd monitoramento && ./setup.sh              # Deploy
+```
+
+### **Production (Produção)**
+```bash
+echo "3" | ./generate-secure-passwords.sh   # Gerar senhas
+./apply-passwords.sh prod                   # Aplicar senhas
+cd monitoramento && ./setup.sh              # Deploy
+```
+
+**Diferenças entre ambientes:**
+- 🔐 **Senhas**: Dev usa senhas com prefixo `Dev_`, Staging `Stg_`, Production `Prod_`
+- ⚡ **Performance**: Recursos crescentes (Dev: 3 pollers, Prod: 8 pollers)
+- 💾 **Cache**: Dev: 256M, Staging: 1GB, Prod: 2GB
+- 📦 **Backup**: Dev: 7 dias, Staging: 14 dias, Prod: 30 dias
+
+---
+
+## 🔄 **Rotação de Senhas (Sistema de 90 dias)**
+
+O sistema rastreia quando as senhas precisam ser rotacionadas:
+
+### **Verificação Automática**
+O `setup.sh` verifica automaticamente se passou 90 dias desde a geração das senhas:
+- ✅ **Válida**: Mostra quantos dias restam
+- ⚠️ **Expirada**: Alerta e pede confirmação para continuar
+
+### **Rotacionar Manualmente**
+```bash
+# Gerar novas senhas
+echo "1" | ./generate-secure-passwords.sh   # ou 2 para staging, 3 para prod
+
+# Aplicar novas senhas
+./apply-passwords.sh dev                    # ou staging, prod
+
+# Recriar containers com novas senhas
+cd monitoramento
+docker-compose down -v
+docker-compose up -d
+```
+
+### **Verificar Data de Rotação**
+```bash
+cat environments/.env.dev.passwords | grep PASSWORD_ROTATION
+# Saída: PASSWORD_ROTATION_NEEDED_AT=20260205
 ```
 
 ---

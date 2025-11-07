@@ -3,6 +3,15 @@
 # 📊 Script de importação de dashboards para Grafana
 # Importa dashboards iniciais mas deixa eles editáveis (não provisionados)
 
+# Carregar variáveis de ambiente
+if [ -f .env ]; then
+    source .env
+fi
+
+# Definir credenciais do Grafana
+GRAFANA_USER="${GF_SECURITY_ADMIN_USER:-admin}"
+GRAFANA_PASS="${GF_SECURITY_ADMIN_PASSWORD:-admin}"
+
 echo "📊 Importando dashboards iniciais para o Grafana..."
 
 # Aguardar Grafana estar disponível
@@ -18,13 +27,13 @@ echo "✅ Grafana disponível!"
 echo "🔗 Configurando datasources..."
 
 # Verificar se Prometheus já existe
-PROMETHEUS_EXISTS=$(curl -s -u admin:admin http://localhost:3000/api/datasources/name/Prometheus 2>/dev/null | grep -o '"name":"Prometheus"' || echo "")
+PROMETHEUS_EXISTS=$(curl -s -u "$GRAFANA_USER:$GRAFANA_PASS" http://localhost:3000/api/datasources/name/Prometheus 2>/dev/null | grep -o '"name":"Prometheus"' || echo "")
 
 if [ -z "$PROMETHEUS_EXISTS" ]; then
     echo "📈 Adicionando datasource Prometheus..."
     curl -s -X POST \
         -H "Content-Type: application/json" \
-        -u admin:admin \
+        -u "$GRAFANA_USER:$GRAFANA_PASS" \
         http://localhost:3000/api/datasources \
         -d '{
             "name": "Prometheus",
@@ -39,13 +48,13 @@ else
 fi
 
 # Verificar se Zabbix já existe
-ZABBIX_EXISTS=$(curl -s -u admin:admin http://localhost:3000/api/datasources/name/Zabbix 2>/dev/null | grep -o '"name":"Zabbix"' || echo "")
+ZABBIX_EXISTS=$(curl -s -u "$GRAFANA_USER:$GRAFANA_PASS" http://localhost:3000/api/datasources/name/Zabbix 2>/dev/null | grep -o '"name":"Zabbix"' || echo "")
 
 if [ -z "$ZABBIX_EXISTS" ]; then
     echo "🎯 Adicionando datasource Zabbix..."
     curl -s -X POST \
         -H "Content-Type: application/json" \
-        -u admin:admin \
+        -u "$GRAFANA_USER:$GRAFANA_PASS" \
         http://localhost:3000/api/datasources \
         -d '{
             "name": "Zabbix",
@@ -84,7 +93,7 @@ for dashboard_file in "$DASHBOARD_DIR"/*.json; do
         echo "📊 Importando dashboard: $dashboard_name"
         
         # Descobrir UID do datasource Zabbix
-        ZABBIX_UID=$(curl -s -u admin:admin "http://localhost:3000/api/datasources" | grep -o '"uid":"[^"]*"[^}]*"type":"alexanderzobnin-zabbix-datasource"' | grep -o '"uid":"[^"]*"' | cut -d'"' -f4)
+        ZABBIX_UID=$(curl -s -u "$GRAFANA_USER:$GRAFANA_PASS" "http://localhost:3000/api/datasources" | grep -o '"uid":"[^"]*"[^}]*"type":"alexanderzobnin-zabbix-datasource"' | grep -o '"uid":"[^"]*"' | cut -d'"' -f4)
         
         if [ -z "$ZABBIX_UID" ]; then
             echo "⚠️  Não foi possível descobrir UID do datasource Zabbix, usando dashboard original"
@@ -105,7 +114,7 @@ for dashboard_file in "$DASHBOARD_DIR"/*.json; do
         # Importar dashboard usando arquivo temporário
         curl -s -X POST \
             -H "Content-Type: application/json" \
-            -u admin:admin \
+            -u "$GRAFANA_USER:$GRAFANA_PASS" \
             http://localhost:3000/api/dashboards/db \
             -d @"$temp_payload" >/dev/null
         
@@ -119,7 +128,7 @@ done
 echo ""
 echo "🎉 Configuração completa!"
 echo "📊 Dashboards importados e totalmente editáveis!"
-echo "🔗 Acesse: http://localhost:3000 (admin/admin)"
+echo "🔗 Acesse: http://localhost:3000 (${GRAFANA_USER}/<senha-gerada>)"
 echo ""
 echo "💡 Agora você pode:"
 echo "   • Editar dashboards livremente"
