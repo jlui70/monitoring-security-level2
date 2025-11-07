@@ -1,6 +1,6 @@
-# 🔐 Monitoring Security Stack - Level 2
+🔐 Monitoring Security Evolution - Nível 2: Variáveis de Ambiente
 
-**Environment Management + Automated Security** - Stack completa de monitoramento com gerenciamento avançado de variáveis de ambiente.
+**Variáveis de Ambiente + Segurança Automatizada** - Stack completa de monitoramento com gerenciamento avançado de variáveis de ambiente.
 
 Caso tenha realizado o projeto de Segurança nível (1) execute a limpeza antes de iniciar o nível (2) para evitar conflitos na configuração.
 
