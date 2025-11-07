@@ -2,10 +2,22 @@
 
 **Environment Management + Automated Security** - Stack completa de monitoramento com gerenciamento avançado de variáveis de ambiente.
 
-## 🚀 **Quick Start (3 comandos)**
+Caso tenha realizado o projeto de Segurança nível (1) execute a limpeza antes de iniciar o nível (2) para evitar conflitos na configuração.
+
+🧹 Limpeza completa do projeto segurança nível 1
+
+Parar e remover todos os containers
+cd ~/monitoramento && docker-compose down -v
+
+Limpeza completa (remove diretporio projeto monitoring-security-level1 e limpa Docker)
+cd ~/ && rm -rf monitoring-security-level1 docker system prune -f
+
+## 🚀 **Quick Start - Configuração Segurança nível (2)**
 
 ```bash
 # 1. Clone
+cd ~ && mkdir monitoramento
+cd ~/monitoramento
 git clone https://github.com/jlui70/monitoring-security-level2.git
 cd monitoring-security-level2
 
