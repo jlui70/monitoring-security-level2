@@ -129,16 +129,12 @@ Esta é uma série de 5 repositórios que demonstram a **evolução completa de 
 
 ---
 
-## 📞 **Suporte e Contato**
+## 📧 **Contato e Suporte**
 
-### **📧 Contato:**
+- **Autor:** [Luiz Jesus]
+- **Portfólio Devops Project:** [@devopsproject](https://devopsproject.com.br/)
 - **GitHub:** [@jlui70](https://github.com/jlui70)
-- **Email:** [seu-email@exemplo.com]
-
-### **🆘 Suporte:**
-- **Issues:** Para problemas específicos de cada repositório
-- **Discussions:** Para dúvidas gerais sobre a série
-- **Wiki:** Documentação adicional e FAQs
+- **Série Completa:** [Monitoring Security Evolution](https://github.com/jlui70/monitoring-security-evolution)
 
 ---
 
