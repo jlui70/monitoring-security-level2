@@ -1,6 +1,87 @@
-# 🔐 Monitoring Security Stack - Level 2
+# 📋 **Sobre Este Projeto**
+
+Este é o **Nível 2** de uma série de 5 repositórios que demonstram a **evolução completa de segurança** em ambientes containerizados, desde configurações básicas até implementações enterprise-grade com AWS e Kubernetes.
+
+### 🎯 **Objetivo da Série:**
+Demonstrar na prática como **evoluir a segurança de secrets management** em projetos reais, seguindo as melhores práticas da indústria.
+
+## 📊 **O que você ganha no Level 2?**
+
+### **✅ Recursos Adicionais do Level 2:**
+- 🔐 **Senhas Geradas Automaticamente** - Senhas complexas e únicas
+- 🌍 **Ambientes Separados** - Dev, Staging, Production
+- ✅ **Validação Automática** - Configurações verificadas antes do deploy
+- 🔄 **Rotação de Senhas** - Sistema de rotação em 90 dias
+- 📋 **Baseline de Segurança** - Padrões aplicados por ambiente
+
+### **✅ Herda Tudo do Level 1:**
+- 📊 **Stack Completa**: Zabbix 7.0.5 + Grafana 12.0.2 + Prometheus
+- 🖥️ **Monitoramento Sistema**: CPU, RAM, Disk, Network
+- 🗄️ **Monitoramento MySQL**: Performance e métricas avançadas
+- 📈 **Dashboards Prontos**: 2 dashboards funcionais
+- 🎯 **Templates Zabbix**: Auto-configuração de monitoramento
+# 🔐 Gerenciamento de Ambientes e Segurança Automatizada - Level 2
 
 **Environment Management + Automated Security** - Stack completa de monitoramento com gerenciamento avançado de variáveis de ambiente.
+
+---
+
+## 🚀 **Evolução da Série (5 Níveis COMPLETOS)**
+
+<table>
+<thead>
+<tr>
+<th style="min-width: 100px;">Nível</th>
+<th>Foco</th>
+<th>Secrets Storage</th>
+<th>Onde Containers Leem</th>
+<th>Orquestração</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><a href="https://github.com/jlui70/monitoring-security-level1">Level&nbsp;1</a></strong></td>
+<td>Baseline</td>
+<td>Hardcoded</td>
+<td>Código fonte</td>
+<td>Docker Compose</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong><a href="https://github.com/jlui70/monitoring-security-level2">Level&nbsp;2</a></strong></td>
+<td>Env Vars</td>
+<td><code>.env</code> files</td>
+<td><code>.env</code></td>
+<td>Docker Compose</td>
+<td><strong>✅ VOCÊ ESTÁ AQUI</strong></td>
+</tr>
+<tr>
+<td><strong><a href="https://github.com/jlui70/monitoring-security-level3">Level&nbsp;3</a></strong></td>
+<td>Vault Foundation</td>
+<td>Vault + <code>.env</code></td>
+<td><code>.env</code></td>
+<td>Docker Compose</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong><a href="https://github.com/jlui70/monitoring-security-level4-aws-v2">Level&nbsp;4</a></strong></td>
+<td>AWS Cloud</td>
+<td>AWS Secrets Manager</td>
+<td>AWS API</td>
+<td>Terraform + EC2</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong><a href="https://github.com/jlui70/monitoring-security-level5">Level&nbsp;5</a></strong></td>
+<td><strong>K8s + Vault</strong></td>
+<td><strong>Vault (KV v2)</strong></td>
+<td><strong>Kubernetes Secrets</strong></td>
+<td><strong>Kubernetes</strong></td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
 
 ---
 
@@ -250,19 +331,5 @@ cat environments/.env.dev.passwords | grep GF_SECURITY_ADMIN_PASSWORD
 Para configurações avançadas, múltiplos ambientes e detalhes técnicos:
 - 📖 [**Guia Completo de Implementação**](IMPLEMENTATION-STATUS.md)
 - 🏗️ [**Visão Geral da Série**](SERIES-OVERVIEW.md)
-
----
-
-## 🔗 **Série Monitoring Security**
-
-## 🔗 **Série Monitoring Security (COMPLETA)**
-
-- **[Level 1](https://github.com/jlui70/monitoring-security-level1)** - Baseline (hardcoded secrets)
-- **[Level 2](https://github.com/jlui70/monitoring-security-level2)** - Env vars (`.env` files) ⬅️ **VOCÊ ESTÁ AQUI**
-- **[Level 3](https://github.com/jlui70/monitoring-security-level3)** - Vault Foundation (Vault + `.env`)
-- **[Level 4](https://github.com/jlui70/monitoring-security-level4-aws-v2)** - AWS Cloud (AWS Secrets Manager)
-- **[Level 5](https://github.com/jlui70/monitoring-security-level5)** - **K8s + Vault (Consumo direto)** 
-
----
 
 **💡 Dica**: Se é sua primeira vez com monitoramento, comece pelo [Level 1](https://github.com/jlui70/monitoring-security-level1) que é mais simples.
