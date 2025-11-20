@@ -105,6 +105,8 @@ docker system prune -f
 # Agora faça instalação limpa (seguir Quick Start abaixo)
 ```
 Limpeza Level 1 (Somente se realizou Lab Level 1 e ainda não efetuo a limpeza)
+
+```bash
 cd ~/ && rm -rf monitoring-security-level1 docker system prune -f
 
 **💡 Por que limpar?** Volumes Docker antigos guardam senhas e podem causar conflitos.
