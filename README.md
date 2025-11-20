@@ -1,4 +1,13 @@
-# 📋 **Sobre Este Projeto**
+# 🔐 Monitoring Security Evolution - Nível 2: Variáveis de Ambiente
+## Stack de Monitoramento com Zabbix, Grafana e Prometheus
+
+![Security Level](https://img.shields.io/badge/Security%20Level-1%20Basic-red)
+![Docker](https://img.shields.io/badge/Docker-Compose-blue)
+![Status](https://img.shields.io/badge/Status-Production%20Ready-green)
+
+---
+
+## 📋 **Sobre Este Projeto**
 
 Este é o **Nível 2** de uma série de 5 repositórios que demonstram a **evolução completa de segurança** em ambientes containerizados, desde configurações básicas até implementações enterprise-grade com AWS e Kubernetes.
 
