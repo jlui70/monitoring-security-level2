@@ -91,6 +91,26 @@ Demonstrar na prática como **evoluir a segurança de secrets management** em pr
 
 ---
 
+## 🧹 **Limpeza Completa (se já usou antes)**
+
+Se você já executou este projeto Level 2, limpe tudo antes:
+
+```bash
+cd ~/monitoring-security-level2/monitoramento
+docker-compose down -v
+cd ~/
+rm -rf monitoring-security-level2
+docker system prune -f
+
+# Agora faça instalação limpa (seguir Quick Start abaixo)
+```
+Limpeza Level 1 (Somente se realizou Lab Level 1 e ainda não efetuo a limpeza)
+cd ~/ && rm -rf monitoring-security-level1 docker system prune -f
+
+**💡 Por que limpar?** Volumes Docker antigos guardam senhas e podem causar conflitos.
+
+---
+
 ## 🚀 **Quick Start - Primeira Instalação**
 
 **⚠️ IMPORTANTE**: Na primeira vez, você PRECISA gerar senhas antes do deploy!
@@ -113,27 +133,6 @@ cd monitoramento && ./setup.sh
 - **Grafana**: http://localhost:3000 (admin/senha-gerada)
 
 💡 **A senha do Grafana será exibida no final do setup!**
-
----
-
-## 🧹 **Limpeza Completa (se já usou antes)**
-
-Se você já executou este projeto antes ou o Level 1, limpe tudo antes:
-
-```bash
-cd ~/monitoring-security-level2/monitoramento
-docker-compose down -v
-cd ~/
-rm -rf monitoring-security-level2
-docker system prune -f
-
-# Agora faça instalação limpa (seguir Quick Start acima)
-```
-
-**💡 Por que limpar?** Volumes Docker antigos guardam senhas antigas e causam conflitos.
-
----
-
 ## 🔧 **Setup Manual** (mesmo processo, passo a passo)
 
 ```bash
