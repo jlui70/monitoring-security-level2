@@ -1,4 +1,4 @@
-# 🔐 Monitoring Security Evolution - Nível 2: Variáveis de Ambiente
+# 🔐 Monitoring Security Evolution - Nível 2: Gerenciamento de Ambientes e Segurança Automatizada 
 ## Stack de Monitoramento com Zabbix, Grafana e Prometheus
 
 ![Security Level](https://img.shields.io/badge/Security%20Level-1%20Basic-red)
@@ -29,9 +29,6 @@ Demonstrar na prática como **evoluir a segurança de secrets management** em pr
 - 🗄️ **Monitoramento MySQL**: Performance e métricas avançadas
 - 📈 **Dashboards Prontos**: 2 dashboards funcionais
 - 🎯 **Templates Zabbix**: Auto-configuração de monitoramento
-# 🔐 Gerenciamento de Ambientes e Segurança Automatizada - Level 2
-
-**Environment Management + Automated Security** - Stack completa de monitoramento com gerenciamento avançado de variáveis de ambiente.
 
 ---
 
