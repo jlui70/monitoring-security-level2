@@ -255,11 +255,13 @@ Para configurações avançadas, múltiplos ambientes e detalhes técnicos:
 
 ## 🔗 **Série Monitoring Security**
 
-- **[Level 1](https://github.com/jlui70/monitoring-security-level1)** - Baseline monitoring (para iniciantes)
-- **[Level 2](https://github.com/jlui70/monitoring-security-level2)** - Environment management ⬅️ **Você está aqui**
-- **Level 3** - Secrets & Backup (em breve)
-- **Level 4** - AWS Secrets Manager (em breve)
-- **Level 5** - Full Security & Compliance (em breve)
+## 🔗 **Série Monitoring Security (COMPLETA)**
+
+- **[Level 1](https://github.com/jlui70/monitoring-security-level1)** - Baseline (hardcoded secrets)
+- **[Level 2](https://github.com/jlui70/monitoring-security-level2)** - Env vars (`.env` files) ⬅️ **VOCÊ ESTÁ AQUI**
+- **[Level 3](https://github.com/jlui70/monitoring-security-level3)** - Vault Foundation (Vault + `.env`)
+- **[Level 4](https://github.com/jlui70/monitoring-security-level4-aws-v2)** - AWS Cloud (AWS Secrets Manager)
+- **[Level 5](https://github.com/jlui70/monitoring-security-level5)** - **K8s + Vault (Consumo direto)** 
 
 ---
 
