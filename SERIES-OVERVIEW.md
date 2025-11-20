@@ -61,45 +61,6 @@ Esta é uma série de 5 repositórios que demonstram a **evolução completa de 
 
 ---
 
-## 🎯 **Casos de Uso por Nível**
-
-### **🏃‍♂️ Quick Start (Nível 1)**
-```bash
-git clone https://github.com/jlui70/monitoring-security-level1.git
-cd monitoring-security-level1
-docker-compose up -d
-```
-
-### **🏢 Staging Environment (Nível 2)**
-```bash
-git clone https://github.com/jlui70/monitoring-security-level2.git
-cd monitoring-security-level2
-./deploy.sh staging
-```
-
-### **🏛️ Enterprise On-Premise (Nível 3)**
-```bash
-git clone https://github.com/jlui70/monitoring-security-level3.git
-cd monitoring-security-level3
-./setup-vault.sh && ./deploy.sh
-```
-
-### **☁️ AWS Production (Nível 4)**
-```bash
-git clone https://github.com/jlui70/monitoring-security-level4.git
-cd monitoring-security-level4
-aws configure && ./deploy-aws.sh
-```
-
-### **🚀 Multi-Cloud Enterprise (Nível 5)**
-```bash
-git clone https://github.com/jlui70/monitoring-security-level5.git
-cd monitoring-security-level5
-kubectl apply -f manifests/
-```
-
----
-
 ## 📚 **Jornada de Aprendizado**
 
 ### **🎓 Para Iniciantes:**
@@ -126,11 +87,6 @@ kubectl apply -f manifests/
 - **Nível 3:** Diferencial para vagas sênior (8,500+ vagas)
 - **Nível 4:** Foco principal do mercado (35,000+ vagas AWS)
 - **Nível 5:** Requisito para roles principal/staff (2,800+ vagas)
-
-### **💰 Impacto Salarial:**
-- **Conhecimento Básico (1-2):** $70K-$95K
-- **Enterprise Skills (3-4):** $95K-$130K
-- **Advanced/Multi-cloud (5):** $130K-$200K
 
 ---
 
@@ -170,20 +126,6 @@ kubectl apply -f manifests/
 2. **Implemente** melhorias ou correções
 3. **Documente** suas mudanças
 4. **Abra** um Pull Request
-
-### **Tipos de Contribuição:**
-- 📝 Melhorias na documentação
-- 🐛 Correções de bugs
-- ⚡ Otimizações de performance
-- 📊 Novos dashboards
-- 🔒 Melhorias de segurança
-- 🌐 Traduções
-
-### **Community Guidelines:**
-- Use issues para dúvidas específicas de cada nível
-- Discussions para conversas gerais sobre a série
-- PRs devem incluir testes e documentação
-- Mantenha o foco educacional
 
 ---
 
