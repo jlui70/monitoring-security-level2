@@ -110,6 +110,7 @@ Limpeza Level 1 (Somente se realizou Lab Level 1 e ainda não efetuo a limpeza)
 cd ~/ && rm -rf monitoring-security-level1 docker system prune -f
 
 **💡 Por que limpar?** Volumes Docker antigos guardam senhas e podem causar conflitos.
+```
 
 ---
 
