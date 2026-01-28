@@ -8,12 +8,22 @@
 
 ---
 
-## 📋 **Sobre Este Projeto**
+## 📋 **Sobre o Projeto**
 
-Este é o **Nível 2** de uma série de 5 repositórios que demonstram a **evolução completa de segurança** em ambientes containerizados, desde configurações básicas até implementações enterprise-grade com AWS e Kubernetes.
+Este projeto apresenta o **Nível 2** de uma jornada completa de segurança em ambientes containerizados, evoluindo do gerenciamento básico de credenciais hardcoded para um sistema profissional com **variáveis de ambiente, múltiplos ambientes e rotação automática de senhas**.
 
-### 🎯 **Objetivo da Série:**
-Demonstrar na prática como **evoluir a segurança de secrets management** em projetos reais, seguindo as melhores práticas da indústria.
+Para demonstrar a evolução de segurança em secrets management, implementei:
+
+🔐 **Senhas Geradas Automaticamente** com gerador de senhas complexas e únicas
+🌍 **Gerenciamento de Múltiplos Ambientes** (Development, Staging, Production)
+✅ **Validação Automática** de configurações antes do deploy
+🔄 **Sistema de Rotação de Senhas** com alerta de 90 dias
+📊 **Stack de Monitoramento Completa** - Zabbix 7.0.5, Grafana 12.0.2, Prometheus
+🐳 **Docker Compose** com variáveis de ambiente segregadas por ambiente
+
+🎯 **Objetivo**: Demonstrar na prática como evoluir de credenciais hardcoded (Level 1) para um sistema robusto de environment variables, estabelecendo a base para implementações mais avançadas com Vault (Level 3), AWS Secrets Manager (Level 4) e Kubernetes (Level 5).
+
+✅ **Resultado**: Um ambiente de monitoramento production-ready com separação adequada de credenciais por ambiente, validação automatizada e sistema de rotação de senhas, pronto para servir como baseline para evoluções enterprise-grade.
 
 ## 📊 **O que você ganha no Level 2?**
 
@@ -342,3 +352,26 @@ Para configurações avançadas, múltiplos ambientes e detalhes técnicos:
 - 🏗️ [**Visão Geral da Série**](SERIES-OVERVIEW.md)
 
 **💡 Dica**: Se é sua primeira vez com monitoramento, comece pelo [Level 1](https://github.com/jlui70/monitoring-security-level1) que é mais simples.
+
+---
+
+## 📞 **Contato e Suporte**
+
+### 🌐 **Conecte-se Comigo**
+📹 **YouTube**: [DevOps Project](https://youtube.com/@devopsproject)
+💼 **Portfólio**: [devopsproject.com.br](https://devopsproject.com.br)
+💻 **GitHub**: [@jlui70](https://github.com/jlui70)
+
+### 🌟 **Gostou do Projeto?**
+Se este projeto foi útil para você:
+
+⭐ Dê uma estrela nos repositórios
+🔄 Compartilhe com a comunidade
+📹 Inscreva-se no canal do YouTube
+🤝 Contribua com melhorias
+
+---
+
+🎯 **Este é o segundo passo de uma jornada completa de segurança. A evolução continua nos próximos níveis!**
+
+*"A segurança é uma jornada, não um destino. Comece simples, evolua constantemente."*
