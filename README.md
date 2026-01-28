@@ -355,6 +355,12 @@ Para configurações avançadas, múltiplos ambientes e detalhes técnicos:
 
 ---
 
+## � Licença
+
+Este projeto está sob licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+---
+
 ## 📞 Contato e Suporte
 
 ### 🌐 Conecte-se Comigo
