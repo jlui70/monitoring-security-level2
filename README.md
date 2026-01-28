@@ -355,23 +355,26 @@ Para configurações avançadas, múltiplos ambientes e detalhes técnicos:
 
 ---
 
-## 📞 **Contato e Suporte**
+## 📞 Contato e Suporte
 
-### 🌐 **Conecte-se Comigo**
-📹 **YouTube**: [DevOps Project](https://youtube.com/@devopsproject)
-💼 **Portfólio**: [devopsproject.com.br](https://devopsproject.com.br)
-💻 **GitHub**: [@jlui70](https://github.com/jlui70)
+### 🌐 Conecte-se Comigo
 
-### 🌟 **Gostou do Projeto?**
+- 📹 **YouTube**: [DevOps Project](https://devopsproject.com.br/)
+- 💼 **Portfólio**: [devopsproject.com.br](https://devopsproject.com.br/)
+- 💻 **GitHub**: [@jlui70](https://github.com/jlui70)
+
+### 🌟 Gostou do Projeto?
+
 Se este projeto foi útil para você:
 
-⭐ Dê uma estrela nos repositórios
-🔄 Compartilhe com a comunidade
-📹 Inscreva-se no canal do YouTube
-🤝 Contribua com melhorias
+- ⭐ Dê uma estrela nos repositórios
+- 🔄 Compartilhe com a comunidade
+- 📹 Inscreva-se no canal do YouTube
+- 🤝 Contribua com melhorias
 
 ---
 
-🎯 **Este é o segundo passo de uma jornada completa de segurança. A evolução continua nos próximos níveis!**
+**🎯 Este é o primeiro passo de uma jornada completa de segurança. A evolução continua nos próximos níveis!**
 
 *"A segurança é uma jornada, não um destino. Comece simples, evolua constantemente."*
+
