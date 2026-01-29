@@ -1,6 +1,8 @@
 # 🔐 Monitoring Security Evolution - Nível 2: Gerenciamento de Ambientes
 ## Stack de Monitoramento com Zabbix, Grafana e Prometheus
 
+![Diagrama de Arquitetura](Diagrama%20camadas%20Monitoring%20Security%202.png)
+
 ![Security Level](https://img.shields.io/badge/Security%20Level-2%20Environment%20Variables-orange)
 ![Docker](https://img.shields.io/badge/Docker-Compose-blue)
 ![Environments](https://img.shields.io/badge/Environments-Dev%20%7C%20Staging%20%7C%20Prod-purple)
